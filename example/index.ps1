@@ -1,14 +1,16 @@
 using module "..\ExpressPs.psm1"
 
 $app = Get-ExpressPs
-$port = 8085;
+$port = 8085
 
-$app.Use("/api", ".\example\routes\MainRouter.ps1");
+$MiddleWare = {
+    if ($request.BodyString -ne $null) {
+        $request.Body = $request.BodyString | ConvertFrom-Json
+    }
+}
 
-$app.get("/test/:Name", {
-    $response.send($request.Parameters.Name)
-});
+$app.Use("/api", $MiddleWare ,".\example\routes\MainRouter.ps1")
 
 $app.listen($port, {
      Write-Debug "app running on $port"
-});
+})

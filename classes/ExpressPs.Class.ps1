@@ -1,5 +1,5 @@
 class ExpressPs {
-    [Int]$Port
+    [Int]$Port = 1324
     [ExpressRouter]$MainRouter
     [ExpressRouter[]]$Routers
     [Int]$MaxRunspaces = 1
@@ -7,6 +7,7 @@ class ExpressPs {
     [boolean]$https = $false
     [boolean]$auth = 'Anonymous'
     [boolean]$isRunning
+    hidden [int]$NumberOfMiddleWare = (Get-Polaris).RouteMiddleWare.count + 1
     $Polaris
 
     ExpressPs([boolean]$https, [string]$auth){
@@ -21,17 +22,19 @@ class ExpressPs {
        $this.MainRouter = [ExpressRouter]::new('', '')
     }
 
-    Use([string]$Name, $Path){
+    Use([string]$Name, $InputScript, [string]$Path){
+        $this.Use($Name, $Path)
+        $this.Use($InputScript)
+    }
+
+    Use([string]$Name, [string]$Path){
         $this.Routers += [ExpressRouter]::new($Name, $Path)
         .($Path)
     }
 
     Use($InputScript){
-        if(Test-Path -Path $InputScript){
-            New-PolarisRouteMiddleware -ScriptPath $InputScript
-        } else {
-            New-PolarisRouteMiddleware -Scriptblock $InputScript
-        }
+        New-PolarisRouteMiddleware -Name $this.NumberOfMiddleWare -Scriptblock $InputScript
+        $this.NumberOfMiddleWare++
     }
 
     [ExpressRouter]Router($Path){
@@ -77,9 +80,9 @@ class ExpressPs {
 
     hidden InitListener(){
         if($this.https){
-            $this.Polaris = Start-Polaris -Port $this.Port -MinRunspaces $this.MinRunspaces -MaxRunspaces $this.MaxRunspaces -Auth $this.auth -Https $this.https
+            $this.Polaris = Start-Polaris -Port $this.Port -MinRunspaces $this.MinRunspaces -MaxRunspaces $this.MaxRunspaces -Auth $this.auth -Https $this.https -UseJsonBodyParserMiddleware
         } else{
-            $this.Polaris = Start-Polaris -Port $this.Port -MinRunspaces $this.MinRunspaces -MaxRunspaces $this.MaxRunspaces
+            $this.Polaris = Start-Polaris -Port $this.Port -MinRunspaces $this.MinRunspaces -MaxRunspaces $this.MaxRunspaces -UseJsonBodyParserMiddleware
         }
         $this.isRunning = $true
     }
