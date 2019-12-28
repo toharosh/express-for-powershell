@@ -1,7 +1,7 @@
-class express {
+class ExpressPs {
     [Int]$Port
-    [router]$MainRouter
-    [router[]]$Routers
+    [ExpressRouter]$MainRouter
+    [ExpressRouter[]]$Routers
     [Int]$MaxRunspaces = 1
     [Int]$MinRunspaces = 1
     [boolean]$https = $false
@@ -9,20 +9,20 @@ class express {
     [boolean]$isRunning
     $Polaris
 
-    express([boolean]$https, [string]$auth){
+    ExpressPs([boolean]$https, [string]$auth){
         $this.https = $https
         $this.auth = $auth
         $this.express()
     }
 
-    express(){
+    ExpressPs(){
         Stop-Polaris
         Clear-Polaris
-       $this.MainRouter = [router]::new('', '')
+       $this.MainRouter = [ExpressRouter]::new('', '')
     }
 
     Use([string]$Name, $Path){
-        $this.Routers += [Router]::new($Name, $Path)
+        $this.Routers += [ExpressRouter]::new($Name, $Path)
         .($Path)
     }
 
@@ -34,7 +34,7 @@ class express {
         }
     }
 
-    [router]Router($Path){
+    [ExpressRouter]Router($Path){
         $router =  $this.Routers | ?{$Path.Contains($_.Path.Substring($_.Path.IndexOf("\") + 1))}
         if(!$router){
             $router =  $this.Routers | %{$_.findRouter($Path)}

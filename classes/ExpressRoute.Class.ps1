@@ -5,14 +5,14 @@ enum RouteType {
     PUT
 }
 
-class route {
+class ExpressRoute {
     [string]$Url
     [string]$Name
     [RouteType]$Type
     [boolean]$isRunning
     $InputScript
 
-    route([string]$Url, [string]$Name, [RouteType]$Type, $InputScript){
+    ExpressRoute([string]$Url, [string]$Name, [RouteType]$Type, $InputScript){
         $this.Name = $Name
         $this.Url = $Url
         $this.Type = $Type

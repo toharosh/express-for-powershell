@@ -4,5 +4,5 @@ $router.get("/helloworld", {
     $response.json({helloworld="hello world"})
 });
 
-$router.Use("/v1", ".\routes\GlobalRoutes.ps1")
-$router.Use("/hello", ".\routes\TestRoutes.ps1")
+$router.Use("/v1", ".\example\routes\GlobalRoutes.ps1")
+$router.Use("/hello", ".\example\routes\TestRoutes.ps1")
