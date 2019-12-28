@@ -9,6 +9,6 @@ $app.get("/test/:Name", {
     $response.send($request.Parameters.Name)
 });
 
-$app.listen($port, 1, 10, {
+$app.listen($port, {
      Write-Debug "app running on $port"
 });
